@@ -2,6 +2,14 @@
 // Password para vendedor
 const password = "1234";
 
+//Actualiza nombre en la página
+
+if (localStorage.getItem("nombre") !== null) {
+    const nombre = localStorage.getItem("nombre");
+    document.querySelector("#saludo").innerText = "Hola " + nombre + "!";
+}
+
+
 
 //Productos en stock
 let productos = [
@@ -17,48 +25,139 @@ let productos = [
     { id: 10, nombre: "Cámara Fotográfica Canon EOS 1500D", precio: 500000, cantidad: 10 }
 ];
 
+//--------------------------------------------------------------------------------------------
+// Eventos
+
+document.querySelector("#ButtonMostrarProductos").addEventListener("click", mostrarProductos);
+document.querySelector("#ButtonAgregarProductoCarrito").addEventListener("click", productoCarrito);
+document.querySelector("#ButtonEliminarProductoCarrito").addEventListener("click", eliminarProductoCarrito);
+document.querySelector("#ButtonmostrarCarrito").addEventListener("click", mostrarCarrito);
+
+
+//--------------------------------------------------------------------------------------------
+
+//Función para limpiear el contenido del comprador
+function limpiarSectionComprador() {
+
+    let listarProductos = document.getElementById('listarProductos');
+    let agregarProductoComprador = document.getElementById('agregarProductoComprador')
+
+    let carrito = document.getElementById('mostrarCarrito')
+
+    if (listarProductos) {
+        listarProductos.innerHTML = "";
+    }
+
+    if (agregarProductoComprador) {
+        agregarProductoComprador.innerHTML = "";
+    }
+
+    if(carrito){
+        carrito.innerHTML = "";
+    }
+
+
+}
+
+
+
+//--------------------------------------------------------------------------------------------
+
 // Función para mostrar productos disponibles (para comprador y vendedor)
 function mostrarProductos() {
+    limpiarSectionComprador();
     console.log("Productos disponibles:");
-    productos.forEach(producto => {
-        console.log(`${producto.id}. ${producto.nombre} - $${producto.precio} - Stock: ${producto.cantidad}`);
-    });
+    if (localStorage.getItem("productos")) {
+        let productosGuardados = JSON.parse(localStorage.getItem("productos"));
+    
+        productosGuardados.forEach(productosGuardados => {
+            document.querySelector("#listarProductos").innerHTML += `<li class="list-group-item">${productosGuardados.id}. ${productosGuardados.nombre} - $${productosGuardados.precio} - Stock: ${productosGuardados.cantidad}</li>`;
+
+        });
+    } else {
+        productos.forEach(producto => {
+            document.querySelector("#listarProductos").innerHTML += `<li class="list-group-item">${producto.id}. ${producto.nombre} - $${producto.precio} - Stock: ${producto.cantidad}</li>`;
+        });
+    }
+
+
 }
+
+//--------------------------------------------------------------------------------------------
 
 // Función para agregar stock.
 function agregarStock() {
     let id = prompt("Ingrese el ID del producto");
     id = parseInt(id);
 
-    let producto = productos.find(producto => producto.id === id);
+    if (localStorage.getItem("productos")) {
+        let productosGuardados = JSON.parse(localStorage.getItem("productos"));
+        let productoGuardado = productosGuardados.find(producto => producto.id === id);
+        if (productoGuardado) {
 
-    if (producto) {
-        let cantidad = prompt("Ingrese la cantidad que desea agregar al carrito");
-        cantidad = parseInt(cantidad);
+            actualizarStock(productosGuardados, productoGuardado);
 
-        producto.cantidad += cantidad;
-        console.log("Stock actualizado");
+        } else {
+            console.log("Producto no encontrado");
+        }
+    } else if (productos.find(producto => producto.id === id)) {
+        let producto = productos.find(producto => producto.id === id);
+        if (producto) {
+
+            agregar(productos, producto);
+        }
     } else {
         console.log("Producto no encontrado");
     }
 }
 
+
+// función lógica agrega stock.
+function actualizarStock(arrayProductos, producto) {
+    let cantidad = prompt("Ingrese la cantidad que desea agregar al stock");
+    cantidad = parseInt(cantidad);
+    producto.cantidad += cantidad;
+    console.log("Stock actualizado");
+    localStorage.setItem("productos", JSON.stringify(arrayProductos));
+}
+
+// --------------------------------------------------------------------------------------------
 
 //Funcion para eliminar un producto.
 function eliminarProducto() {
     let id = prompt("Ingrese el ID del producto");
     id = parseInt(id);
 
-    let index = productos.indexOf(productos.find(producto => producto.id === id));
-
-    if (index !== -1) {
-        productos.splice(index, 1);
-        console.log("Producto eliminado");
+    if (localStorage.getItem("productos")) {
+        let productosGuardados = JSON.parse(localStorage.getItem("productos"));
+        let index = productosGuardados.indexOf(productosGuardados.find(productosGuardados => productosGuardados.id === id));
+        if (index !== -1) {
+            eliminar(productosGuardados, index);
+        } else {
+            console.log("Producto no encontrado");
+        }
+    } else if (productos.indexOf(productos.find(producto => producto.id === id))) {
+        let index = productos.indexOf(productos.find(producto => producto.id === id));
+        if (index !== -1) {
+            eliminar(productos, index);
+        } else {
+            console.log("Producto no encontrado");
+        }
     } else {
         console.log("Producto no encontrado");
     }
 }
 
+// Función lógica para eliminar un producto.
+function eliminar(arrayProductos, index) {
+    arrayProductos.splice(index, 1);
+    console.log("Producto eliminado");
+    localStorage.setItem("productos", JSON.stringify(arrayProductos));
+}
+
+
+
+//--------------------------------------------------------------------------------------------
 //Función para agregar un producto
 function agregarProducto() {
     let id = prompt("Ingrese el ID del producto");
@@ -66,101 +165,213 @@ function agregarProducto() {
 
     id = parseInt(id);
 
-    let producto = productos.find(producto => producto.id === id);
+    if (localStorage.getItem("productos")) {
+        let productosGuardados = JSON.parse(localStorage.getItem("productos"));
+        let producto = productosGuardados.find(producto => producto.id === id);
 
+        if (!producto) {
+            agregar(productosGuardados, id);
 
-    if (!producto) {
-        let nombre = prompt("Ingrese el nombre del producto nuevo");
-        let cantidad = prompt("Ingrese la cantidad del producto");
-        cantidad = parseInt(cantidad);
-        while (cantidad <= 0) {
-            console.log("Cantidad no válida");
-            cantidad = prompt("Ingrese la cantidad del producto");
+        } else {
+            console.log("El ID ya existe");
         }
-
-        let precio = prompt("Ingrese el precio del producto");
-        precio = parseInt(precio);
-        while (precio <= 0) {
-            console.log("Precio no válido");
-            precio = prompt("Ingrese el precio del producto");
-        }
-        productos.push({ id, nombre, precio, cantidad });
     } else {
-        console.log("El ID ya existe");
+        let producto = productos.find(producto => producto.id === id)
+        if (!producto) {
+            agregar(productos, id);
+        } else {
+            console.log("El ID ya existe");
+        }
     }
 }
 
+// Función lógica agregar
+function agregar(arrayProductos, id) {
+    let nombre = prompt("Ingrese el nombre del producto nuevo");
+    let cantidad = prompt("Ingrese la cantidad del producto");
+    cantidad = parseInt(cantidad);
+    while (cantidad <= 0) {
+        console.log("Cantidad no válida");
+        cantidad = prompt("Ingrese la cantidad del producto");
+    }
+
+    let precio = prompt("Ingrese el precio del producto");
+    precio = parseInt(precio);
+    while (precio <= 0) {
+        console.log("Precio no válido");
+        precio = prompt("Ingrese el precio del producto");
+    }
+    arrayProductos.push({ id, nombre, precio, cantidad });
+    localStorage.setItem("productos", JSON.stringify(arrayProductos));
+}
+
+//--------------------------------------------------------------------------------------------
 
 
 let carrito = [];
 
 //Función para agregar un producto al carrito
+function productoCarrito() {
+    limpiarSectionComprador();
+    document.querySelector("#agregarProductoComprador").innerHTML = "<div class='input mb-3'> <input  id= 'idProductoComrpador' type='text' class='form-control'  placeholder='Id Producto' aria-label='Username'> <input  id= 'idCantidad' type='text' class='form-control' placeholder='Cantidad' aria-label='Username'> </br>  </div> <button id ='idAgregarProducto' type='button' class='btn btn-success'>Agregar</button>";
+    document.querySelector("#idAgregarProducto").addEventListener("click", agregarProductoCarrito);
+
+}
+
 function agregarProductoCarrito() {
-    let id = prompt("Ingrese el ID del producto");
-    id = parseInt(id);
+    let idStr = document.querySelector("#idProductoComrpador").value;
+    let id = parseInt(idStr);
 
-    let producto = productos.find(producto => producto.id === id);
+    let cantidadStr = document.querySelector("#idCantidad").value;
+    let cantidad = parseInt(cantidadStr);
 
-    if (producto) {
-        let cantidad = prompt("Ingrese la cantidad que desea agregar al carrito");
-        cantidad = parseInt(cantidad);
+    if (localStorage.getItem("productos")) {
+        let productosGuardados = JSON.parse(localStorage.getItem("productos"));
+        let producto = productosGuardados.find(producto => producto.id === id);
 
-        if (cantidad <= producto.cantidad) {
-            producto.cantidad -= cantidad;
-            carrito.push({ id, nombre: producto.nombre, precio: producto.precio, cantidad });
-
-            console.log("Producto agregado al carrito");
+        if (producto) {
+            actualizarCarrito(producto, cantidad);
+            alert("Producto Agregado correctamente")
+            limpiarSectionComprador();
         } else {
-            console.log("Cantidad no disponible");
+            alert("Producto no encontrado");
+        }
+
+    } else {
+        let producto = productos.find(producto => producto.id === id);
+        if (producto) {
+            actualizarCarrito(producto, cantidad);
+            alert("Producto Agregado correctamente")
+            limpiarSectionComprador();
+        } else {
+            alert("Producto no encontrado");
+        }
+
+    }
+}
+
+
+
+// Función lógica para agregar un producto al carrito
+function actualizarCarrito(producto, cantidad) {
+
+    if (cantidad <= producto.cantidad) {
+        producto.cantidad -= cantidad;
+        carrito.push({ id: producto.id, nombre: producto.nombre, precio: producto.precio, cantidad: cantidad });
+
+        if(localStorage.getItem("carrito")){
+            let carritoGuardado = JSON.parse(localStorage.getItem("carrito"));
+            carritoGuardado.push(carrito);
+            localStorage.setItem("carrito", JSON.stringify(carrito));
+        }
+       
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+    } else {
+        alert("Cantidad no disponible");
+    }
+}
+
+
+
+
+//--------------------------------------------------------------------------------------------
+//Función para eliminar un producto del carrito.
+function eliminarProductoCarrito() {
+    limpiarSectionComprador();
+    document.querySelector("#agregarProductoComprador").innerHTML = "<div class='input mb-3'> <input  id= 'idProductoComprador' type='text' class='form-control'  placeholder='Id Producto a Eliminar' aria-label='Username'> </br>  </div> <button id ='idEliminarProducto' type='button' class='btn btn-success'>Eliminar</button>";
+    document.querySelector("#idEliminarProducto").addEventListener("click", descontarCarrito);
+}
+
+function descontarCarrito() {
+    if (localStorage.getItem("carrito")) {
+        //Se recupera el valor del input
+        let idStr = document.querySelector("#idProductoComprador").value;
+
+        //Se parsea a entero
+        let id = parseInt(idStr);
+
+        let carritoGuardado = JSON.parse(localStorage.getItem("carrito"));
+        let producto = carritoGuardado.find(productoCarrito => productoCarrito.id === id);
+        if (producto) {
+            carrito.splice(carrito.indexOf(id), 1);
+            productos.find(producto => producto.id === id).cantidad += producto.cantidad;
+            alert("Producto eliminado del carrito");
+            localStorage.setItem("carrito", JSON.stringify(carrito));
+
+        } else {
+            alert("Producto no encontrado");
         }
     } else {
-        console.log("Producto no encontrado");
-    }
-}
+        let producto = carrito.find(productoCarrito => productoCarrito.id === id);
 
-//Función para eliminar un producto del carrito
-function eliminarProductoCarrito() {
-    let id = prompt("Ingrese el ID del producto");
-    id = parseInt(id);
+        if (producto) {
+            carrito.splice(carrito.indexOf(id), 1);
+            productos.find(producto => producto.id === id).cantidad += producto.cantidad;
+            alert("Producto eliminado del carrito");
+            localStorage.setItem("carrito", JSON.stringify(carrito));
 
-    let producto = carrito.find(productoCarrito => productoCarrito.id === id);
+        } else {
+            alert("Producto no encontrado");
+        }
 
-    if (producto) {
-        carrito.splice(carrito.indexOf(id), 1);
-        productos.find(producto => producto.id === id).cantidad += producto.cantidad;
-        console.log("Producto eliminado del carrito");
-
-    } else {
-        console.log("Producto no encontrado");
     }
 }
 
 
-//Función para mostrar el carrito
+
+//--------------------------------------------------------------------------------------------
+
+//Función para mostrar el carrito 
 function mostrarCarrito() {
-    console.log("Carrito:");
-    carrito.forEach(producto => {
-        console.log(`${producto.id}. ${producto.nombre} - $${producto.precio} - Cantidad: ${producto.cantidad}`);
-    });
+    limpiarSectionComprador();
+    if (localStorage.getItem("carrito")) {
+        let carritoGuardado = JSON.parse(localStorage.getItem("carrito"));
+        if(carritoGuardado <=0){
+            alert("No hay productos en el carrito");
+        }
+        carritoGuardado.forEach(producto => {
+            document.getElementById('listarProductos').innerHTML += `<li class="list-group-item">${producto.id}. ${producto.nombre} - $${producto.precio} - Cantidad: ${producto.cantidad}</li>`;
+        });
+    } else {
+        if(carrito <= 0){
+            alert("No hay productos en el carrito");
+        }
+        carrito.forEach(producto => {
+            document.getElementById('listarProductos').innerHTML += `<li class="list-group-item">${producto.id}. ${producto.nombre} - $${producto.precio} - Cantidad: ${producto.cantidad}</li>`;
+        });
+    }
+
+
 }
 
 
 //Función para login e inicio de app
 function login() {
-    let perfil = prompt("Comprador (1) - Vendedor (2)");
 
-    // Convertir perfil a número
-    perfil = parseInt(perfil);
+    const nombre = document.querySelector("#nombre").value;
+    const perfilStr = document.querySelector("#perfil").value;
+
+    //validación de campos.
+    if (nombre === '' || perfilStr === "") {
+        alert("Por favor, complete los campos");
+        return;
+    }
+
+    const perfil = parseInt(perfilStr);
+    localStorage.setItem("nombre", nombre);
+
 
     switch (perfil) {
         case 1:
-            window.location.href = "./comprador.html";
+            window.location.href = "./pages/comprador.html";
             break;
 
         case 2:
             let pass = prompt("Ingrese su contraseña");
             if (pass === password) {
-                window.location.href = "./vendedor.html";
+                window.location.href = "./pages/vendedor.html";
+
+
 
             } else {
                 while (pass !== password) {
