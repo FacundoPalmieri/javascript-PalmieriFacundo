@@ -361,35 +361,36 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-//Agregar producto al carrito
-document.getElementById("contenedor-productos").addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-agregar")) {
-        const id = parseInt(e.target.dataset.id);
-        agregarProductoCarrito(id);
-    }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    //Agregar producto al carrito
+    document.getElementById("contenedor-productos").addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-agregar")) {
+            const id = parseInt(e.target.dataset.id);
+            agregarProductoCarrito(id);
+        }
+    });
+
+
+    //Mostrar carrito
+    document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
+
+    //Eliminr producto al carrito
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("eliminar")) {
+            eliminarProducto(e);
+        }
+    });
+
+
+    //Finalizar Compra
+    document.addEventListener("click", function (e) {
+        if (e.target && e.target.id === "btn-comprar") {
+            finalizarCompra();
+        }
+    });
 });
-
-//Mostrar carrito
-document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
-
-//Eliminr producto al carrito
-document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("eliminar")) {
-        eliminarProducto(e);
-    }
-});
-
-
-//Finalizar Compra
-document.addEventListener("click", function (e) {
-    if (e.target && e.target.id === "btn-comprar") {
-        finalizarCompra();
-    }
-});
-
-
-
-
 
 
 
