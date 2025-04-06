@@ -21,10 +21,6 @@ let productos = [
 
 
 
-
-
-
-
 //---------------------------------------------------------------------------------------------
 // Sección Login
 //---------------------------------------------------------------------------------------------
@@ -46,7 +42,7 @@ if (window.location.pathname.includes("index.html")) {
             Swal.fire({
                 icon: "error",
                 title: "Por favor, complete su nombre",
-                width: "150px",
+                width: "250px",
                 customClass: {
                     popup: "small-popup"
                 }
@@ -55,6 +51,12 @@ if (window.location.pathname.includes("index.html")) {
     }
 
 }
+
+
+//---------------------------------------------------------------------------------------------
+// Sección Comprador
+//---------------------------------------------------------------------------------------------
+
 
 if (window.location.pathname.includes("comprador.html")) {
     //Actualiza nombre en la página comprador 
@@ -91,7 +93,7 @@ async function cargarProductos() {
 
 
 
-
+// Función buscar producto
 function buscar(event) {
     event.preventDefault();
     const valorBusqueda = document.querySelector("#input-busqueda").value.toLowerCase();
@@ -117,7 +119,7 @@ function buscar(event) {
 }
 
 
-
+// Función buscar producto por categoría
 function buscarPorCategoria(categoria) {
     console.log(productos[0].category);
     console.log(categoria);
@@ -141,127 +143,17 @@ function buscarPorCategoria(categoria) {
 
 
 
-
+//Funcíón para limpiar el buscador.
 function limpiarBuscador() {
     if (inputBusqueda.value.trim() === "") {
         mostrarProductos(productos);
     }
 }
 
-//--------------------------------------------------------------------------------------------
-// Sección Eventos
-//--------------------------------------------------------------------------------------------
-
-const btnIngresar = document.querySelector("#btn-ingresar");
-if (btnIngresar) {
-    btnIngresar.addEventListener("click", login);
-}
-
-document.querySelector("#home").addEventListener("click", () => mostrarProductos(productos))
-
-document.querySelector("#form-busqueda").addEventListener("submit", buscar);
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const btnMujeresVestimenta = document.querySelector("#mujeres-vestimenta");
-    const btnMujeresAccesorio = document.querySelector("#mujeres-accesorios");
-    const btnHombres = document.querySelector("#hombres");
-    const btnTecnologia = document.querySelector("#tecnologia");
-
-    if (btnMujeresVestimenta) {
-        btnMujeresVestimenta.addEventListener("click", () => buscarPorCategoria("women's clothing"));
-    }
-
-    if (btnMujeresAccesorio) {
-        btnMujeresAccesorio.addEventListener("click", () => buscarPorCategoria("jewelery"));
-    }
-
-
-
-    if (btnHombres) {
-        btnHombres.addEventListener("click", () => buscarPorCategoria("men's clothing"));
-    }
-
-    if (btnTecnologia) {
-        btnTecnologia.addEventListener("click", () => buscarPorCategoria("electronics"));
-    }
-
-});
-
-
-document.getElementById("contenedor-productos").addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-agregar")) {
-        const id = parseInt(e.target.dataset.id);
-        agregarProductoCarrito(id);
-    }
-});
-
-
-document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
-
-
-document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("eliminar")) {
-        eliminarProducto(e);
-    }
-});
-
-document.addEventListener("click", function (e) {
-    if (e.target && e.target.id === "btn-comprar") {
-        finalizarCompra();
-    }
-});
-
-
-
-//document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
-
-/** 
-const inputBusqueda = document.querySelector("#input-busqueda");
-if (inputBusqueda) {
-    inputBusqueda.addEventListener("input", limpiarBuscador);
-}
 
 
 
 
-
-
-
-
-document.querySelector("#ButtonEliminarProductoCarrito").addEventListener("click", eliminarProductoCarrito);
-
-
-
-
-//--------------------------------------------------------------------------------------------
-
-//Función para limpiear el contenido del comprador
-function limpiarSectionComprador() {
-
-    let listarProductos = document.getElementById('listarProductos');
-    let agregarProductoComprador = document.getElementById('agregarProductoComprador')
-
-    let carrito = document.getElementById('mostrarCarrito')
-
-    if (listarProductos) {
-        listarProductos.innerHTML = "";
-    }
-
-    if (agregarProductoComprador) {
-        agregarProductoComprador.innerHTML = "";
-    }
-
-    if (carrito) {
-        carrito.innerHTML = "";
-    }
-
-
-}
-
-*/
-
-//--------------------------------------------------------------------------------------------
 
 // Función para mostrar productos disponibles 
 function mostrarProductos(productos) {
@@ -290,9 +182,259 @@ function mostrarProductos(productos) {
 
 
 
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+function agregarProductoCarrito(id) {
+    // Se obtiene el ID del producto del array local.
+    const producto = productosCompleto.find(producto => producto.id === id);
+
+    //Se verifica si existe un carrito en localStorage para actualizarlo o crearlo.
+    if (localStorage.getItem("carrito")) {
+        let carritoAlmacenado = JSON.parse(localStorage.getItem("carrito"));
+
+        //Buscamos si existe el producto en el carrito para aumentar cantidad o incorporar el producto.
+        let indice = carritoAlmacenado.findIndex(item => item.id === id);
+        if (indice !== -1) {
+            carritoAlmacenado[indice].cantidad += 1;
+        } else {
+            carritoAlmacenado.push(producto);
+        }
+        localStorage.setItem("carrito", JSON.stringify(carritoAlmacenado));
+    } else {
+        let carrito = [];
+        carrito.push(producto);
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+    }
+
+    mostrarCarrito();
+    Toastify({
+        text: "Producto agregado",
+        duration: 1000,
+        style: {
+            background: "green",
+            borderRadius: "50px",
+            color: "white",
+        }
+
+    }).showToast();
+}
+
+
+
+//Función para mostrar el carrito
+function mostrarCarrito() {
+    let contenedor = document.getElementById('carrito-lista');
+    let totalContenedor = document.getElementById('total-carrito');
+    if (contenedor && totalContenedor) {
+        contenedor.innerHTML = "";
+        totalContenedor.innerHTML = "";
+
+        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+        let total = 0;
+
+        carrito.forEach(producto => {
+            total += producto.price * producto.cantidad;
+            contenedor.innerHTML += `
+                <div class="card mb-2" style="max-width: 100%;">
+                    <div class="row g-0">
+                        <div class="col-3">
+                            <img src="${producto.image}" class="img-fluid rounded-start" alt="${producto.title}">
+                        </div>
+                        <div class="col-6">
+                            <div class="card-body p-2">
+                                <h6 class="card-title mb-1">${producto.title}</h6>
+                                <p class="card-text mb-1">$${producto.price}</p>
+                                <p class="card-text"><small class="text-muted">${producto.category}</small></p>
+                                <p class="card-text"><small class="text-muted">Cantidad: ${producto.cantidad} </small></p>
+                            </div>
+                        </div>
+                        <div class="col-3 d-flex align-items-center justify-content-center">
+                            <button class="btn btn-danger btn-sm eliminar"  data-id="${producto.id}">🗑</button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        if (total !== 0) {
+            totalContenedor.innerHTML = `
+        <div class="mt-3">
+            <h5>Total a pagar: $${total}</h5>
+            <button id="btn-comprar" class="btn btn-success mt-2">Comprar</button>
+        </div>`;
+        }
+    }
+}
+
+
+//Función para eliminar producto del carrito
+function eliminarProducto(e) {
+    const id = parseInt(e.target.dataset.id);
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito = carrito.filter(producto => producto.id !== id);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    mostrarCarrito();
+    Toastify({
+        text: "Producto eliminado",
+        duration: 1000,
+        style: {
+            background: "red",
+            borderRadius: "50px",
+            color: "white",
+        }
+
+    }).showToast();
+}
+
+
+//Función para finalizar Compra
+function finalizarCompra() {
+    localStorage.removeItem('carrito');
+    mostrarCarrito();
+    const offcanvas = document.getElementById('offcanvasScrolling');
+    const instance = bootstrap.Offcanvas.getInstance(offcanvas);
+    if (instance) instance.hide();
+
+    Swal.fire({
+        title: "Compra realizada!",
+        icon: "success",
+        draggable: true
+    });
+}
+
+
+
+
 
 //--------------------------------------------------------------------------------------------
-/** 
+// Sección Eventos
+//--------------------------------------------------------------------------------------------
+
+
+//Ingresar en el login
+const btnIngresar = document.querySelector("#btn-ingresar");
+if (btnIngresar) {
+    btnIngresar.addEventListener("click", login);
+}
+
+
+// Mostrar productos
+document.querySelector("#home").addEventListener("click", () => mostrarProductos(productos))
+
+
+//Buscar producto por buscador
+document.querySelector("#form-busqueda").addEventListener("submit", buscar);
+
+//Buscar producto por categoría
+document.addEventListener("DOMContentLoaded", () => {
+    const btnMujeresVestimenta = document.querySelector("#mujeres-vestimenta");
+    const btnMujeresAccesorio = document.querySelector("#mujeres-accesorios");
+    const btnHombres = document.querySelector("#hombres");
+    const btnTecnologia = document.querySelector("#tecnologia");
+
+    if (btnMujeresVestimenta) {
+        btnMujeresVestimenta.addEventListener("click", () => buscarPorCategoria("women's clothing"));
+    }
+
+    if (btnMujeresAccesorio) {
+        btnMujeresAccesorio.addEventListener("click", () => buscarPorCategoria("jewelery"));
+    }
+
+
+
+    if (btnHombres) {
+        btnHombres.addEventListener("click", () => buscarPorCategoria("men's clothing"));
+    }
+
+    if (btnTecnologia) {
+        btnTecnologia.addEventListener("click", () => buscarPorCategoria("electronics"));
+    }
+
+});
+
+
+//Agregar producto al carrito
+document.getElementById("contenedor-productos").addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-agregar")) {
+        const id = parseInt(e.target.dataset.id);
+        agregarProductoCarrito(id);
+    }
+});
+
+//Mostrar carrito
+document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
+
+//Eliminr producto al carrito
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("eliminar")) {
+        eliminarProducto(e);
+    }
+});
+
+
+//Finalizar Compra
+document.addEventListener("click", function (e) {
+    if (e.target && e.target.id === "btn-comprar") {
+        finalizarCompra();
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
+
+/**
+const inputBusqueda = document.querySelector("#input-busqueda");
+if (inputBusqueda) {
+    inputBusqueda.addEventListener("input", limpiarBuscador);
+}
+
+document.querySelector("#ButtonEliminarProductoCarrito").addEventListener("click", eliminarProductoCarrito);
+
+*/
+
+
+
+
+
+/**
+//--------------------------------------------------------------------------------------------
+
+//Función para limpiear el contenido del comprador
+function limpiarSectionComprador() {
+
+    let listarProductos = document.getElementById('listarProductos');
+    let agregarProductoComprador = document.getElementById('agregarProductoComprador')
+
+    let carrito = document.getElementById('mostrarCarrito')
+
+    if (listarProductos) {
+        listarProductos.innerHTML = "";
+    }
+
+    if (agregarProductoComprador) {
+        agregarProductoComprador.innerHTML = "";
+    }
+
+    if (carrito) {
+        carrito.innerHTML = "";
+    }
+
+
+}
+
+
 // Función para agregar stock.
 function agregarStock() {
     let id = prompt("Ingrese el ID del producto");
@@ -330,9 +472,6 @@ function actualizarStock(arrayProductos, producto) {
 }
 
 
-
-// --------------------------------------------------------------------------------------------
-
 //Funcion para eliminar un producto.
 function eliminarProducto() {
     let id = prompt("Ingrese el ID del producto");
@@ -366,8 +505,6 @@ function eliminar(arrayProductos, index) {
 }
 
 
-
-//--------------------------------------------------------------------------------------------
 //Función para agregar un producto
 function agregarProducto() {
     let id = prompt("Ingrese el ID del producto");
@@ -414,13 +551,9 @@ function agregar(arrayProductos, id) {
     arrayProductos.push({ id, nombre, precio, cantidad });
     localStorage.setItem("productos", JSON.stringify(arrayProductos));
 }
-*/
-//--------------------------------------------------------------------------------------------
 
 
-let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-/*
 //Función para agregar un producto al carrito
 function productoCarrito() {
     limpiarSectionComprador();
@@ -463,42 +596,9 @@ function agregarProductoCarrito() {
 }*/
 
 
-function agregarProductoCarrito(id) {
-    // Se obtiene el ID del producto del array local.
-    const producto = productosCompleto.find(producto => producto.id === id);
 
-    //Se verifica si existe un carrito en localStorage para actualizarlo o crearlo.
-    if (localStorage.getItem("carrito")) {
-        let carritoAlmacenado = JSON.parse(localStorage.getItem("carrito"));
 
-        //Buscamos si existe el producto en el carrito para aumentar cantidad o incorporar el producto.
-        let indice = carritoAlmacenado.findIndex(item => item.id === id);
-        if (indice !== -1) {
-            carritoAlmacenado[indice].cantidad += 1;
-        } else {
-            carritoAlmacenado.push(producto);
-        }
-        localStorage.setItem("carrito", JSON.stringify(carritoAlmacenado));
-    } else {
-        let carrito = [];
-        carrito.push(producto);
-        localStorage.setItem("carrito", JSON.stringify(carrito));
-    }
-
-    mostrarCarrito();
-    Toastify({
-        text: "Producto agregado",
-        duration: 1000,
-        style: {
-            background: "green",
-            borderRadius: "50px",
-            color: "white",
-        }
-
-    }).showToast();
-}
-
-/** 
+/**
 
 // Función lógica para agregar un producto al carrito
 function actualizarCarrito(producto, cantidad) {
@@ -594,80 +694,4 @@ function mostrarCarrito() {
 
 }
 */
-
-//Función para mostrar el carrito
-function mostrarCarrito() {
-    let contenedor = document.getElementById('carrito-lista');
-    let totalContenedor = document.getElementById('total-carrito');
-    if (contenedor && totalContenedor) {
-        contenedor.innerHTML = "";
-        totalContenedor.innerHTML = "";
-
-        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-        let total = 0;
-
-        carrito.forEach(producto => {
-            total += producto.price * producto.cantidad;
-            contenedor.innerHTML += `
-                <div class="card mb-2" style="max-width: 100%;">
-                    <div class="row g-0">
-                        <div class="col-3">
-                            <img src="${producto.image}" class="img-fluid rounded-start" alt="${producto.title}">
-                        </div>
-                        <div class="col-6">
-                            <div class="card-body p-2">
-                                <h6 class="card-title mb-1">${producto.title}</h6>
-                                <p class="card-text mb-1">$${producto.price}</p>
-                                <p class="card-text"><small class="text-muted">${producto.category}</small></p>
-                                <p class="card-text"><small class="text-muted">Cantidad: ${producto.cantidad} </small></p>
-                            </div>
-                        </div>
-                        <div class="col-3 d-flex align-items-center justify-content-center">
-                            <button class="btn btn-danger btn-sm eliminar"  data-id="${producto.id}">🗑</button>
-                        </div>
-                    </div>
-                </div>`;
-        });
-
-        totalContenedor.innerHTML = `
-        <div class="mt-3">
-            <h5>Total a pagar: $${total}</h5>
-            <button id="btn-comprar" class="btn btn-success mt-2">Comprar</button>
-        </div>`;
-    }
-}
-
-
-//Función para eliminar producto del carrito
-function eliminarProducto(e) {
-    const id = parseInt(e.target.dataset.id);
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    carrito = carrito.filter(producto => producto.id !== id);
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    mostrarCarrito();
-    Toastify({
-        text: "Producto eliminado",
-        duration: 1000,
-        style: {
-            background: "red",
-            borderRadius: "50px",
-            color: "white",
-        }
-
-    }).showToast();
-}
-
-
-//Función para finalizar Compra
-function finalizarCompra() {
-    localStorage.removeItem('carrito');
-    mostrarCarrito();
-    Swal.fire({
-        title: "Compra realizada!",
-        icon: "success",
-        draggable: true
-    });
-}
-
 

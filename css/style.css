@@ -10,7 +10,7 @@ img {
   align-items: center;
   height: 100vh;
   flex-direction: column;
-  background-color: #f8fc46;
+  background-color: #f8fc46 !important;
 }
 .login h2 {
   display: flex;
@@ -22,12 +22,16 @@ img {
   align-items: center;
   width: 100%;
 }
+.login .logo-login {
+  width: 200px;
+  height: 200px;
+}
 
 .small-popup {
-  width: 150px;
-  height: 200px;
+  width: 250px;
+  height: 300px;
   padding: 10px;
-  font-size: 8px;
+  font-size: 12px;
   text-align: center;
 }
 
@@ -59,8 +63,8 @@ header .navbar {
   background-color: #f8fc46 !important;
 }
 header .navbar img {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
 }
 
 .usaurio-contenedor {
