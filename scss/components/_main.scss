@@ -1,33 +1,46 @@
-/* ---------------------------- INDEX ----------------------------  */
-
-.form-control {
-    margin-top: 3%;
-    margin-bottom: 3%;
+img {
+    height: 100px;
+    width: 100px;
 }
 
-.main-comprador {
+.login {
     display: flex;
-    border: 1px solid red;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    background-color: #f8fc46;
+
+    h2 {
+        display: flex;
+        justify-content: center;
+    }
+
+    .login-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
 }
 
-// Listar Productos - Comprador.
-#listarProductos {
-    margin-top: 20px;
+.small-popup {
+    width: 150px;
+    height: 200px;
+    padding: 10px;
+    font-size: 8px;
+    text-align: center;
 }
 
-#idProductoAgregar {
-
-    margin-bottom: 0px;
-}
-
-//Input AgregarProducto - Comprador.
-.input-group{
-    margin-top: 10px;
-    width: 200px;
+.small-popup-comprador {
+    width: 250px;
+    height: 250px;
+    padding: 10px;
+    font-size: 12px;
+    text-align: center;
 }
 
 
-// Btn Agregar Producto - Comprador.
-.btn {
-    font-size: 10px;
+.offcanvas {
+    top: 95px !important;
 }
