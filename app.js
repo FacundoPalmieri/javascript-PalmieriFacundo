@@ -364,33 +364,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    //Agregar producto al carrito
-    document.getElementById("contenedor-productos").addEventListener("click", (e) => {
-        if (e.target.classList.contains("btn-agregar")) {
-            const id = parseInt(e.target.dataset.id);
-            agregarProductoCarrito(id);
-        }
-    });
+    // Agregar producto al carrito (si existe el contenedor de productos)
+    const contenedor = document.getElementById("contenedor-productos");
+    if (contenedor) {
+        contenedor.addEventListener("click", (e) => {
+            if (e.target.classList.contains("btn-agregar")) {
+                const id = parseInt(e.target.dataset.id);
+                agregarProductoCarrito(id);
+            }
+        });
+    }
 
+    // Mostrar carrito (si existe el botón #mi-carrito)
+    const btnCarrito = document.querySelector("#mi-carrito");
+    if (btnCarrito) {
+        btnCarrito.addEventListener("click", mostrarCarrito);
+    }
 
-    //Mostrar carrito
-    document.querySelector("#mi-carrito").addEventListener("click", mostrarCarrito);
-
-    //Eliminr producto al carrito
+    // Eliminar producto del carrito (no requiere validación porque escucha todo el documento)
     document.addEventListener("click", function (e) {
         if (e.target.classList.contains("eliminar")) {
             eliminarProducto(e);
         }
     });
 
-
-    //Finalizar Compra
+    // Finalizar compra (misma lógica: escucha todo el documento)
     document.addEventListener("click", function (e) {
         if (e.target && e.target.id === "btn-comprar") {
             finalizarCompra();
         }
     });
 });
+
 
 
 
