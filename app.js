@@ -318,13 +318,20 @@ if (btnIngresar) {
 
 // Mostrar productos
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector("#home").addEventListener("click", () => mostrarProductos(productos))
-})
+    const btnHome = document.querySelector("#home");
+    if (btnHome) {
+        btnHome.addEventListener("click", () => mostrarProductos(productos));
+    }
+});
 
+// Buscar producto por buscador
+document.addEventListener("DOMContentLoaded", function () {
+    const formBusqueda = document.querySelector("#form-busqueda");
+    if (formBusqueda) {
+        formBusqueda.addEventListener("submit", buscar);
+    }
+});
 
-
-//Buscar producto por buscador
-document.querySelector("#form-busqueda").addEventListener("submit", buscar);
 
 //Buscar producto por categoría
 document.addEventListener("DOMContentLoaded", () => {
