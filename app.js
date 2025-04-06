@@ -317,7 +317,10 @@ if (btnIngresar) {
 
 
 // Mostrar productos
-document.querySelector("#home").addEventListener("click", () => mostrarProductos(productos))
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector("#home").addEventListener("click", () => mostrarProductos(productos))
+})
+
 
 
 //Buscar producto por buscador
