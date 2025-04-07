@@ -26,7 +26,7 @@ let productos = [
 //---------------------------------------------------------------------------------------------
 
 
-if (window.location.pathname.includes("index.html")) {
+if (document.title === "Mercado Script") {
 
     //Función para login e inicio de app
     function login() {
@@ -58,7 +58,7 @@ if (window.location.pathname.includes("index.html")) {
 //---------------------------------------------------------------------------------------------
 
 
-if (window.location.pathname.includes("comprador.html")) {
+if (document.title === "Mi perfil") {
     //Actualiza nombre en la página comprador 
     if (localStorage.getItem("nombre") !== null) {
         const nombre = localStorage.getItem("nombre");
